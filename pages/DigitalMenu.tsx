@@ -41,13 +41,15 @@ const DigitalMenu: React.FC = () => {
         fetchMenu();
     }, []);
 
+    const normalize = (str: string) =>
+        str ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+
     const itemsByCategory = (category: string) => {
-        return menuItems.filter(item => item.category === category);
+        return menuItems.filter(item => normalize(item.category) === normalize(category));
     };
 
     const handleCategoryClick = (cat: string) => {
         setActiveCategory(cat);
-        // Removemos o scroll para manter o banner estático
     };
 
     const getItemImage = (item: MenuItem) => {
@@ -61,16 +63,25 @@ const DigitalMenu: React.FC = () => {
         if (name.includes('prato feito 3')) return "https://images.unsplash.com/photo-1617191518005-9d6c07bcb35c?auto=format&fit=crop&w=400&q=80";
         if (name.includes('feijoada')) return "https://images.unsplash.com/photo-1625944525533-473f1c1b8d9c?auto=format&fit=crop&w=400&q=80";
 
+        // Para Levar (Marmitas)
+        if (name.includes('marmita')) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=400&q=80";
+
+        // Porções
+        if (name.includes('batata')) return "https://images.unsplash.com/photo-1573014167075-44f31c83056a?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('torresmo')) return "https://images.unsplash.com/photo-1633504582015-81711204060d?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('calabresa')) return "https://images.unsplash.com/photo-1599321955419-78332151127b?auto=format&fit=crop&w=400&q=80";
+
+        // Bebidas
+        if (name.includes('coca') || name.includes('refrigerante')) return "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('cerveja') || name.includes('heineken') || name.includes('skol')) return "https://images.unsplash.com/photo-1532634896-26909d0d4b89?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('suco')) return "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('agua')) return "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=400&q=80";
+
         // Sobremesas
         if (name.includes('mousse')) return "https://images.unsplash.com/photo-1605478900471-3e3ed7c02c8f?auto=format&fit=crop&w=400&q=80";
         if (name.includes('pudim')) return "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('bolo de pote')) return "https://images.unsplash.com/photo-1612197527273-1f4c8b1d4b8a?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('gelatina mosaico')) return "https://images.unsplash.com/photo-1589307004395-9e4c5c5f9a9c?auto=format&fit=crop&w=400&q=80";
-
-        // Fallbacks por categoria
-        if (item.category === 'Bebidas') return "https://images.unsplash.com/photo-1544145945-f904253d0c7e?auto=format&fit=crop&w=400&q=80";
-        if (item.category === 'Porções') return "https://images.unsplash.com/photo-1573014167075-44f31c83056a?auto=format&fit=crop&w=400&q=80";
-        if (item.category === 'Para Levar') return "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('bolo')) return "https://images.unsplash.com/photo-1612197527273-1f4c8b1d4b8a?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('gelatina')) return "https://images.unsplash.com/photo-1589307004395-9e4c5c5f9a9c?auto=format&fit=crop&w=400&q=80";
 
         return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80";
     };
