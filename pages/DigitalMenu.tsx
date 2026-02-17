@@ -19,23 +19,20 @@ const DigitalMenu: React.FC = () => {
         { name: 'Configurações', path: '/admin/settings', icon: 'settings' },
     ];
 
-    const [error, setError] = useState<string | null>(null);
-
     useEffect(() => {
         const fetchMenu = async () => {
             try {
                 setLoading(true);
-                setError(null);
-                const { data, error: sbError } = await supabase
+                const { data, error } = await supabase
                     .from('menu_items')
                     .select('*')
+                    .eq('active', true)
                     .order('name');
 
-                if (sbError) throw sbError;
+                if (error) throw error;
                 setMenuItems(data || []);
-            } catch (err: any) {
+            } catch (err) {
                 console.error('Erro ao carregar cardápio:', err);
-                setError(err.message || 'Erro de conexão');
             } finally {
                 setLoading(false);
             }
@@ -101,13 +98,8 @@ const DigitalMenu: React.FC = () => {
     const renderEmptyState = () => (
         <div className="flex flex-col items-center justify-center p-12 text-center opacity-40">
             <span className="material-symbols-outlined text-6xl mb-4 text-red-600 font-light">inventory_2</span>
-            <p className="font-bold text-lg uppercase tracking-widest text-[#181111]">
-                {error ? 'Erro de Conexão' : 'Nenhum item disponível'}
-            </p>
-            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
-            <p className="text-sm mt-2">
-                Categorias: {[...new Set(menuItems.map(i => i.category))].join(', ') || 'Nenhuma'}
-            </p>
+            <p className="font-bold text-lg uppercase tracking-widest text-[#181111]">Nenhum item disponível</p>
+            <p className="text-sm">Os pratos aparecerão aqui assim que forem adicionados no painel.</p>
         </div>
     );
 
