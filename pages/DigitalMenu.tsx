@@ -50,13 +50,39 @@ const DigitalMenu: React.FC = () => {
         // Removemos o scroll para manter o banner estático
     };
 
+    const getItemImage = (item: MenuItem) => {
+        if (item.image) return item.image;
+
+        const name = item.name.toLowerCase();
+        // Refeições
+        if (name.includes('self service')) return "https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('prato feito 1')) return "https://images.unsplash.com/photo-1604908554161-3b0a30e6c8d6?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('prato feito 2')) return "https://images.unsplash.com/photo-1625944230945-1b7dd0c3a5b4?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('prato feito 3')) return "https://images.unsplash.com/photo-1617191518005-9d6c07bcb35c?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('feijoada')) return "https://images.unsplash.com/photo-1625944525533-473f1c1b8d9c?auto=format&fit=crop&w=400&q=80";
+
+        // Sobremesas
+        if (name.includes('mousse')) return "https://images.unsplash.com/photo-1605478900471-3e3ed7c02c8f?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('pudim')) return "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('bolo de pote')) return "https://images.unsplash.com/photo-1612197527273-1f4c8b1d4b8a?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('gelatina mosaico')) return "https://images.unsplash.com/photo-1589307004395-9e4c5c5f9a9c?auto=format&fit=crop&w=400&q=80";
+
+        // Fallbacks por categoria
+        if (item.category === 'Bebidas') return "https://images.unsplash.com/photo-1544145945-f904253d0c7e?auto=format&fit=crop&w=400&q=80";
+        if (item.category === 'Porções') return "https://images.unsplash.com/photo-1573014167075-44f31c83056a?auto=format&fit=crop&w=400&q=80";
+        if (item.category === 'Para Levar') return "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=400&q=80";
+
+        return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80";
+    };
+
     const renderRefeicoes = () => (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             {itemsByCategory('Refeições').map((item) => (
-                <div key={item.id} className="p-4 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col justify-center min-h-[110px]">
-                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2">{item.name}</h3>
+                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
+                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
+                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
                     <p className="text-red-600 font-black text-lg tracking-tighter">
-                        {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
                 </div>
             ))}
@@ -66,10 +92,11 @@ const DigitalMenu: React.FC = () => {
     const renderParaLevar = () => (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             {itemsByCategory('Para Levar').map((item) => (
-                <div key={item.id} className="p-4 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col justify-center min-h-[110px]">
-                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2">{item.name}</h3>
+                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
+                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
+                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
                     <p className="text-red-600 font-black text-lg tracking-tighter">
-                        {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
                 </div>
             ))}
@@ -79,10 +106,11 @@ const DigitalMenu: React.FC = () => {
     const renderPorcoes = () => (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             {itemsByCategory('Porções').map((item) => (
-                <div key={item.id} className="p-4 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col justify-center min-h-[110px]">
-                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2">{item.name}</h3>
+                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
+                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
+                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
                     <p className="text-red-600 font-black text-lg tracking-tighter">
-                        {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
                 </div>
             ))}
@@ -92,10 +120,11 @@ const DigitalMenu: React.FC = () => {
     const renderBebidas = () => (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
             {itemsByCategory('Bebidas').map((item) => (
-                <div key={item.id} className="p-4 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col justify-center min-h-[110px]">
-                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2">{item.name}</h3>
+                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
+                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
+                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
                     <p className="text-red-600 font-black text-lg tracking-tighter">
-                        {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </p>
                 </div>
             ))}
@@ -103,10 +132,14 @@ const DigitalMenu: React.FC = () => {
     );
 
     const renderSobremesas = () => (
-        <div className="grid grid-cols-2 gap-4 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {itemsByCategory('Sobremesas').map(item => (
-                <div key={item.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm text-center flex items-center justify-center min-h-[80px]">
-                    <h3 className="font-black digital-menu-text-dark text-sm uppercase">{item.name}</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {itemsByCategory('Sobremesas').map((item) => (
+                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
+                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
+                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
+                    <p className="text-red-600 font-black text-lg tracking-tighter">
+                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
                 </div>
             ))}
         </div>
