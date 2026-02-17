@@ -12,57 +12,49 @@ const Sidebar = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
-    { label: 'Painel Geral', icon: 'dashboard', path: '/' },
-    { label: 'Pedidos', icon: 'shopping_bag', path: '/orders' },
-    { label: 'Gestão do Menu', icon: 'restaurant_menu', path: '/menu' },
-    { label: 'Clientes', icon: 'group', path: '/customers' },
-    { label: 'Relatórios', icon: 'bar_chart', path: '/reports' },
+    { label: 'Visão Geral', icon: 'dashboard', path: '/' },
+    { label: 'Relatório de Pedidos', icon: 'list_alt', path: '/orders' },
+    { label: 'Itens do Cardápio', icon: 'menu_book', path: '/menu' },
+    { label: 'Base de Clientes', icon: 'people', path: '/customers' },
     { label: 'Configurações', icon: 'settings', path: '/settings' },
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-border-dark flex flex-col z-50">
-      <div className="p-6 flex items-center gap-3">
-        <div className="size-10 rounded-lg bg-primary flex items-center justify-center text-white">
-          <span className="material-symbols-outlined fill">restaurant</span>
+    <aside className="fixed left-0 top-0 h-screen w-[72px] hover:w-64 bg-white border-r border-google-gray-300 flex flex-col z-50 transition-all duration-300 group overflow-hidden">
+      <div className="h-16 flex items-center px-4 gap-4 flex-shrink-0 border-b border-google-gray-300">
+        <div className="size-10 rounded bg-primary flex items-center justify-center text-white flex-shrink-0">
+          <span className="material-symbols-outlined fill">analytics</span>
         </div>
-        <div>
-          <h1 className="text-sm font-bold leading-tight">MJC Admin</h1>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold">Sistema de Gestão</p>
-        </div>
+        <span className="font-bold text-google-text-primary whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Looker MJC</span>
       </div>
-      
-      <nav className="flex-1 px-4 space-y-1 mt-4">
+
+      <nav className="flex-1 py-4 space-y-1 overflow-y-auto no-scrollbar">
         {navItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${
-              isActive(item.path)
-                ? 'bg-primary/10 text-primary border-l-4 border-primary'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 hover:text-primary'
-            }`}
+            className={`flex items-center gap-4 px-4 py-3 transition-colors ${isActive(item.path)
+                ? 'bg-primary/10 text-primary'
+                : 'text-google-text-secondary hover:bg-google-gray-100 hover:text-google-text-primary'
+              }`}
           >
-            <span className={`material-symbols-outlined text-[22px] ${isActive(item.path) ? 'fill' : ''}`}>
+            <span className={`material-symbols-outlined text-[24px] ${isActive(item.path) ? 'fill' : ''}`}>
               {item.icon}
             </span>
-            <span className="text-sm font-medium">{item.label}</span>
+            <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">{item.label}</span>
           </Link>
         ))}
       </nav>
 
-      <div className="p-4 border-t border-slate-200 dark:border-border-dark">
-        <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-100 dark:bg-surface-dark/50">
-          <div className="size-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
+      <div className="p-4 border-t border-google-gray-300">
+        <div className="flex items-center gap-4 py-2">
+          <div className="size-10 rounded-full bg-google-gray-200 flex items-center justify-center text-google-text-secondary font-bold text-xs flex-shrink-0">
             JD
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <p className="text-sm font-semibold truncate">João Diretor</p>
-            <p className="text-[10px] text-slate-500">Gerente de Turno</p>
+            <p className="text-[11px] text-google-text-secondary uppercase">Admin</p>
           </div>
-          <button className="text-slate-400 hover:text-red-500 transition-colors">
-            <span className="material-symbols-outlined text-lg">logout</span>
-          </button>
         </div>
       </div>
     </aside>
@@ -70,25 +62,37 @@ const Sidebar = () => {
 };
 
 const Header = () => {
+  const location = useLocation();
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case '/': return 'Painel de Desempenho Administrativo';
+      case '/orders': return 'Relatório Detalhado de Pedidos';
+      case '/menu': return 'Gestão de Itens e Cardápio';
+      case '/customers': return 'Explorador de Base de Clientes';
+      case '/settings': return 'Configurações do Relatório';
+      default: return 'Visão Geral';
+    }
+  };
+
   return (
-    <header className="h-16 border-b border-slate-200 dark:border-border-dark px-8 flex items-center justify-between bg-white/50 dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-40">
-      <div className="flex-1 max-w-xl">
-        <div className="relative">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-          <input
-            className="w-full bg-slate-100 dark:bg-surface-dark border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary placeholder:text-slate-400 transition-all"
-            placeholder="Pesquisar pedidos, clientes ou pratos..."
-            type="text"
-          />
+    <header className="h-16 border-b border-google-gray-300 px-6 flex items-center justify-between bg-white sticky top-0 z-40">
+      <div className="flex items-center gap-4">
+        <h1 className="text-lg font-medium text-google-text-primary">{getPageTitle()}</h1>
+        <div className="h-4 w-[1px] bg-google-gray-300 mx-2 hidden sm:block"></div>
+        <div className="hidden sm:flex items-center gap-1 text-google-text-secondary text-xs">
+          <span className="px-2 py-1 rounded hover:bg-google-gray-100 cursor-pointer">Arquivo</span>
+          <span className="px-2 py-1 rounded hover:bg-google-gray-100 cursor-pointer">Editar</span>
+          <span className="px-2 py-1 rounded hover:bg-google-gray-100 cursor-pointer">Visualizar</span>
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        <button className="relative p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-border-dark rounded-lg transition-colors">
-          <span className="material-symbols-outlined">notifications</span>
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-surface-dark"></span>
+      <div className="flex items-center gap-3">
+        <button className="flex items-center gap-2 px-4 py-1.5 border border-google-gray-300 rounded text-sm font-medium text-google-text-primary hover:bg-google-gray-100 transition-all">
+          <span className="material-symbols-outlined text-lg">share</span>
+          Compartilhar
         </button>
-        <button className="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-border-dark rounded-lg transition-colors">
-          <span className="material-symbols-outlined">help</span>
+        <button className="flex items-center gap-2 px-4 py-1.5 bg-primary text-white rounded text-sm font-bold shadow-sm hover:bg-primary/90 transition-all">
+          <span className="material-symbols-outlined text-lg">visibility</span>
+          Ver
         </button>
       </div>
     </header>
@@ -98,11 +102,11 @@ const Header = () => {
 const App: React.FC = () => {
   return (
     <HashRouter>
-      <div className="flex">
+      <div className="flex bg-google-gray-100 min-h-screen font-sans">
         <Sidebar />
-        <div className="flex-1 ml-64 min-h-screen flex flex-col">
+        <div className="flex-1 ml-[72px] flex flex-col min-h-screen">
           <Header />
-          <main className="flex-1 p-8 overflow-y-auto bg-slate-50 dark:bg-background-dark/30">
+          <main className="flex-1 p-6 md:p-8 overflow-y-auto">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/orders" element={<Orders />} />
@@ -112,10 +116,14 @@ const App: React.FC = () => {
               <Route path="*" element={<Dashboard />} />
             </Routes>
           </main>
-          <footer className="p-6 text-center border-t border-slate-200 dark:border-border-dark bg-white dark:bg-background-dark">
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-bold">
-              © 2024 MJC Restaurante - Dashboard Administrativo v2.4.0
-            </p>
+          <footer className="py-4 px-8 border-t border-google-gray-300 flex justify-between items-center text-[11px] text-google-text-secondary bg-white">
+            <div className="flex gap-4">
+              <span>Última atualização: Hoje, 12:00</span>
+              <span>Proprietário: MJC Restaurante</span>
+            </div>
+            <div className="font-medium uppercase tracking-wider">
+              Google Looker Studio UI Pattern
+            </div>
           </footer>
         </div>
       </div>

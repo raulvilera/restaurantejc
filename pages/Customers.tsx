@@ -70,70 +70,76 @@ const Customers = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in slide-in-from-left-4 duration-500">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Gestão de Clientes</h2>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Base de dados gerada automaticamente a partir dos pedidos realizados.</p>
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-2 text-google-text-secondary text-sm">
+          <span className="material-symbols-outlined text-lg">group</span>
+          Gerencie e explore sua base de clientes fidelizados.
         </div>
-        <button className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-semibold transition-all shadow-lg shadow-primary/20">
-          <span className="material-symbols-outlined text-lg">person_add</span>
-          Adicionar Cliente
-        </button>
+        <div className="flex gap-2">
+          <button className="px-4 py-1.5 border border-google-gray-300 rounded text-sm font-medium hover:bg-white transition-all bg-google-gray-200/50">
+            Exportar XLS
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: 'Total Clientes', value: stats.total, trend: 'Gerado via Pedidos', up: null },
-          { label: 'Ticket Médio', value: formatCurrency(stats.avgTicket), trend: 'Média Geral', up: null },
-          { label: 'Total Gasto Base', value: formatCurrency(customers.reduce((acc, c) => acc + c.totalSpent, 0)), trend: 'Soma de Pedidos', up: true },
-        ].map((stat, i) => (
-          <div key={i} className="bg-white dark:bg-surface-dark p-5 rounded-xl border border-slate-200 dark:border-border-dark shadow-sm">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
-            <div className="flex items-end gap-2 text-primary">
-              <span className="text-2xl font-black">{stat.value}</span>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="looker-card p-4">
+          <p className="text-[10px] font-bold text-google-text-secondary uppercase tracking-tight mb-1">Base Ativa</p>
+          <p className="text-xl font-bold text-google-text-primary">{stats.total} Clientes</p>
+        </div>
+        <div className="looker-card p-4">
+          <p className="text-[10px] font-bold text-google-text-secondary uppercase tracking-tight mb-1">Ticket Médio Geral</p>
+          <p className="text-xl font-bold text-google-text-primary">{formatCurrency(stats.avgTicket)}</p>
+        </div>
+        <div className="looker-card p-4 border-l-4 border-l-primary">
+          <p className="text-[10px] font-bold text-google-text-secondary uppercase tracking-tight mb-1">Nível de Retenção</p>
+          <p className="text-xl font-bold text-google-text-primary">85% <span className="text-[10px] font-normal text-green-600 ml-1">▲ 2%</span></p>
+        </div>
+      </div>
+
+      <div className="looker-card overflow-hidden">
+        <div className="p-4 border-b border-google-gray-300 bg-google-gray-100/30 flex items-center justify-between">
+          <h3 className="text-sm font-bold text-google-text-primary">Explorador de Clientes</h3>
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-google-text-secondary text-sm">search</span>
+            <input
+              className="pl-8 pr-4 py-1 border border-google-gray-300 rounded text-xs focus:ring-1 focus:ring-primary w-64 outline-none"
+              placeholder="Pesquisar por nome ou celular..."
+            />
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-slate-100 dark:border-border-dark bg-slate-50 dark:bg-background-dark/50">
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nome</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Contato</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Última Visita</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Total Acumulado</th>
-                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
+              <tr className="bg-white border-b border-google-gray-200">
+                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight">Identidade</th>
+                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight">Contato</th>
+                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight">Pedidos</th>
+                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight text-right">Total Gasto</th>
+                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight text-right">Última Visita</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-border-dark">
+            <tbody className="divide-y divide-google-gray-100 bg-white">
               {loading ? (
-                <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-500">Carregando clientes...</td></tr>
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-google-text-secondary text-xs">Carregando base de clientes...</td></tr>
               ) : customers.length === 0 ? (
-                <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-500">Nenhum cliente com pedidos registrados.</td></tr>
-              ) : customers.map((c, idx) => (
-                <tr key={idx} className="hover:bg-primary/5 transition-colors cursor-pointer group">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                <tr><td colSpan={5} className="px-6 py-12 text-center text-google-text-secondary text-xs">Nenhum cliente registrado.</td></tr>
+              ) : customers.map((customer, idx) => (
+                <tr key={idx} className="hover:bg-google-gray-100/50 transition-colors group cursor-default">
+                  <td className="px-6 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold">{c.initials}</div>
-                      <span className="font-bold text-sm">{c.name}</span>
+                      <div className="size-8 rounded flex items-center justify-center bg-primary/10 text-primary font-bold text-xs uppercase">
+                        {customer.initials}
+                      </div>
+                      <span className="text-xs font-bold text-google-text-primary">{customer.name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{c.contact}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 text-center">{new Date(c.lastOrder).toLocaleDateString('pt-BR')}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[11px] font-bold">{formatCurrency(c.totalSpent)}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
-                      <button className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors">
-                        <span className="material-symbols-outlined text-lg">visibility</span>
-                      </button>
-                    </div>
-                  </td>
+                  <td className="px-6 py-3 text-xs text-google-text-secondary">{customer.contact}</td>
+                  <td className="px-6 py-3 text-xs text-google-text-secondary">{customer.orderCount} transações</td>
+                  <td className="px-6 py-3 text-xs font-bold text-google-text-primary text-right">{formatCurrency(customer.totalSpent)}</td>
+                  <td className="px-6 py-3 text-[10px] text-google-text-secondary text-right">{new Date(customer.lastOrder).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
