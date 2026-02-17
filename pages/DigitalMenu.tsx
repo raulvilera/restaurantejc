@@ -19,20 +19,23 @@ const DigitalMenu: React.FC = () => {
         { name: 'Configurações', path: '/admin/settings', icon: 'settings' },
     ];
 
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         const fetchMenu = async () => {
             try {
                 setLoading(true);
-                const { data, error } = await supabase
+                setError(null);
+                const { data, error: sbError } = await supabase
                     .from('menu_items')
                     .select('*')
-                    .eq('active', true)
                     .order('name');
 
-                if (error) throw error;
+                if (sbError) throw sbError;
                 setMenuItems(data || []);
-            } catch (err) {
+            } catch (err: any) {
                 console.error('Erro ao carregar cardápio:', err);
+                setError(err.message || 'Erro de conexão');
             } finally {
                 setLoading(false);
             }
@@ -42,7 +45,7 @@ const DigitalMenu: React.FC = () => {
     }, []);
 
     const normalize = (str: string) =>
-        str ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : "";
+        str ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "") : "";
 
     const itemsByCategory = (category: string) => {
         const normFilter = normalize(category);
@@ -50,7 +53,7 @@ const DigitalMenu: React.FC = () => {
             const normItem = normalize(item.category);
             if (normItem === normFilter) return true;
 
-            // Mapeamentos de sinônimos para garantir que o cardápio não fique vazio se o banco usar termos diferentes
+            // Mapeamentos de sinônimos mais robustos sem espaços
             if (normFilter === 'paralevar' && (normItem === 'marmitas' || normItem === 'marmita')) return true;
             if (normFilter === 'porcoes' && (normItem === 'acompanhamentos' || normItem === 'porcao' || normItem === 'entradas')) return true;
             if (normFilter === 'refeicoes' && (normItem === 'pratos' || normItem === 'almoco' || normItem === 'jantar')) return true;
@@ -95,8 +98,13 @@ const DigitalMenu: React.FC = () => {
     const renderEmptyState = () => (
         <div className="flex flex-col items-center justify-center p-12 text-center opacity-40">
             <span className="material-symbols-outlined text-6xl mb-4 text-red-600 font-light">inventory_2</span>
-            <p className="font-bold text-lg uppercase tracking-widest text-[#181111]">Nenhum item disponível</p>
-            <p className="text-sm">Os pratos aparecerão aqui assim que forem adicionados no painel.</p>
+            <p className="font-bold text-lg uppercase tracking-widest text-[#181111]">
+                {error ? 'Erro de Conexão' : 'Nenhum item disponível'}
+            </p>
+            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+            <p className="text-sm mt-2">
+                Categorias: {[...new Set(menuItems.map(i => i.category))].join(', ') || 'Nenhuma'}
+            </p>
         </div>
     );
 
