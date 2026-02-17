@@ -181,24 +181,41 @@ const DigitalMenu: React.FC = () => {
         </div>
     );
 
+    const bannerImages = [
+        "https://images.unsplash.com/photo-1543353071-873f17a7a088?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Buffet
+        "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Carne Assada
+        "https://images.unsplash.com/photo-1594914141203-9bb6da0d4bca?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Feijoada Style
+        "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Buffet 2
+        "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Torresmo Style
+    ];
+
     return (
         <div className="min-h-screen bg-white pb-32 overflow-x-hidden">
-            {/* Header Banner Fixo */}
-            <div className="relative h-[480px] w-full">
-                <img
-                    src="https://images.unsplash.com/photo-1543353071-873f17a7a088?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80"
-                    alt="JC Restaurantes - Self Service"
-                    className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            {/* Header Banner - CARROSSEL INFINITO */}
+            <div className="relative h-[480px] w-full overflow-hidden bg-slate-900">
+                <div className="animate-carousel-banner h-full">
+                    {/* Duplicamos as imagens para o loop infinito ser perfeito */}
+                    {[...bannerImages, ...bannerImages].map((img, index) => (
+                        <div key={index} className="h-full min-w-full sm:min-w-[50%] lg:min-w-[33.33%] relative">
+                            <img
+                                src={img}
+                                alt={`Slide ${index}`}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                {/* Overlay do banner */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-black/20 to-transparent pointer-events-none"></div>
 
                 {/* Restaurant Info */}
-                <div className="absolute top-1/4 left-6 text-white text-shadow-lg z-10">
-                    <h1 className="text-4xl font-black text-white tracking-tight drop-shadow-2xl">
+                <div className="absolute top-1/4 left-6 text-white text-shadow-lg z-10 pointer-events-none">
+                    <h1 className="text-5xl font-black text-white tracking-tight drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)] uppercase italic">
                         JC Restaurantes
                     </h1>
-                    <p className="text-sm flex items-center gap-1 opacity-90 text-white font-semibold mt-2 drop-shadow-lg">
-                        <span className="material-symbols-outlined text-sm text-white">location_on</span>
+                    <p className="text-base flex items-center gap-2 opacity-95 text-white font-black mt-3 drop-shadow-lg">
+                        <span className="material-symbols-outlined text-red-600 bg-white rounded-full p-0.5 text-sm font-bold">location_on</span>
                         Jd das Camélias, São Paulo
                     </p>
                 </div>
@@ -215,8 +232,8 @@ const DigitalMenu: React.FC = () => {
                                 key={cat}
                                 onClick={() => handleCategoryClick(cat)}
                                 className={`px-6 py-3 rounded-full text-sm font-black transition-all whitespace-nowrap shadow-sm border ${activeCategory === cat
-                                        ? 'bg-red-600 text-white border-red-600 scale-105'
-                                        : 'bg-slate-50 text-red-600 border-slate-100'
+                                    ? 'bg-red-600 text-white border-red-600 scale-105'
+                                    : 'bg-slate-50 text-red-600 border-slate-100'
                                     }`}
                             >
                                 {cat}

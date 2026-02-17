@@ -42,6 +42,23 @@ body {
     font-weight: normal !important;
 }
 
+/* Animação do Carrossel do Banner (Esquerda para Direita) */
+@keyframes scroll-left-to-right {
+    0% {
+        transform: translateX(-50%);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.animate-carousel-banner {
+    display: flex;
+    width: fit-content;
+    animation: scroll-left-to-right 40s linear infinite;
+}
+
 /* Utilitário para esconder scrollbar */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
