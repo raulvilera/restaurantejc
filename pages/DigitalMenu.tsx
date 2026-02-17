@@ -182,11 +182,11 @@ const DigitalMenu: React.FC = () => {
     );
 
     const bannerImages = [
-        "https://images.unsplash.com/photo-1543353071-873f17a7a088?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Buffet
-        "https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Carne Assada
-        "https://images.unsplash.com/photo-1594914141203-9bb6da0d4bca?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Feijoada Style
-        "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Buffet 2
-        "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80", // Torresmo Style
+        "/banner/banner1.png",
+        "/banner/banner2.png",
+        "/banner/banner3.png",
+        "/banner/banner4.png",
+        "/banner/banner5.png",
     ];
 
     return (
