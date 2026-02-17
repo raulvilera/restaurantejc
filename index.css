@@ -24,3 +24,25 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+/* Forçar texto branco e destacado em toda a plataforma */
+* {
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+/* Exceções para manter usabilidade (ícones, botões de ação específicos) */
+.material-symbols-outlined {
+  font-weight: normal !important;
+}
+
+.bg-emerald-500,
+.bg-green-500,
+.bg-red-500,
+.bg-yellow-500,
+.text-emerald-500,
+.text-green-500,
+.text-red-500 {
+  /* Se houver classes de status, talvez queiramos manter a cor original para avisos */
+  /* Mas o usuário pediu TODAS as palavras brancas. Vou priorizar o branco conforme pedido. */
+}
