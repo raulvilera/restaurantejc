@@ -228,35 +228,43 @@ const DigitalMenu: React.FC = () => {
                         JC Restaurantes
                     </h1>
                     <div className="flex items-center justify-center gap-2 mt-4">
-                        <span className="h-[2px] w-8 bg-red-600"></span>
+                        <span className="h-[2px] w-8 bg-black"></span>
                         <p className="text-sm opacity-95 text-white font-black drop-shadow-lg uppercase tracking-[0.2em]">
                             Jd das Camélias, SP
                         </p>
-                        <span className="h-[2px] w-8 bg-red-600"></span>
+                        <span className="h-[2px] w-8 bg-black"></span>
+                    </div>
+                </div>
+
+                {/* Categories Navigation - OVER BANNER & PERMANENT */}
+                <div className="absolute bottom-10 left-0 right-0 z-30 px-4">
+                    <div className="max-w-4xl mx-auto bg-black/30 backdrop-blur-xl p-2 rounded-2xl border border-white/10 shadow-2xl overflow-x-auto no-scrollbar scroll-smooth">
+                        <div className="flex items-center gap-4 py-1 min-w-max px-2">
+                            {categories.map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => handleCategoryClick(cat)}
+                                    className={`px-6 py-3 rounded-xl text-xs font-black transition-all whitespace-nowrap uppercase tracking-widest flex items-center gap-2 group hover:scale-110 active:scale-95 ${activeCategory === cat
+                                        ? 'bg-red-600 text-white shadow-lg shadow-red-600/40 ring-2 ring-white/20'
+                                        : 'bg-white/10 text-white/80 hover:bg-white/20 hover:text-white'
+                                        }`}
+                                >
+                                    <span className="material-symbols-outlined text-lg leading-none">
+                                        {cat === 'Refeições' ? 'restaurant' :
+                                            cat === 'Para Levar' ? 'takeout_dining' :
+                                                cat === 'Porções' ? 'bakery_dining' :
+                                                    cat === 'Bebidas' ? 'local_bar' : 'icecream'}
+                                    </span>
+                                    {cat}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Main Content Immediately Below the Banner */}
-            <div className="relative z-20 bg-white px-4 pt-6 min-h-screen">
-
-                {/* Categories Navigation - STICKY AT TOP */}
-                <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md -mx-4 px-4 pb-4 pt-4 border-b border-red-600/10">
-                    <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-                        {categories.map((cat) => (
-                            <button
-                                key={cat}
-                                onClick={() => handleCategoryClick(cat)}
-                                className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap shadow-sm border ${activeCategory === cat
-                                    ? 'bg-red-600 text-white border-red-600 scale-105'
-                                    : 'bg-red-600/10 text-red-600 border-transparent'
-                                    }`}
-                            >
-                                {cat}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+            {/* Main Content Below the Banner */}
+            <div className="relative z-20 bg-white px-4 pt-10 min-h-screen">
 
                 {/* Dynamic Category Title */}
                 <div className="mt-8 mb-6 border-b-2 border-red-600/10 pb-2 flex items-center gap-3">
