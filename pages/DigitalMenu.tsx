@@ -42,10 +42,21 @@ const DigitalMenu: React.FC = () => {
     }, []);
 
     const normalize = (str: string) =>
-        str ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+        str ? str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : "";
 
     const itemsByCategory = (category: string) => {
-        return menuItems.filter(item => normalize(item.category) === normalize(category));
+        const normFilter = normalize(category);
+        return menuItems.filter(item => {
+            const normItem = normalize(item.category);
+            if (normItem === normFilter) return true;
+
+            // Mapeamentos de sinônimos para garantir que o cardápio não fique vazio se o banco usar termos diferentes
+            if (normFilter === 'paralevar' && (normItem === 'marmitas' || normItem === 'marmita')) return true;
+            if (normFilter === 'porcoes' && (normItem === 'acompanhamentos' || normItem === 'porcao' || normItem === 'entradas')) return true;
+            if (normFilter === 'refeicoes' && (normItem === 'pratos' || normItem === 'almoco' || normItem === 'jantar')) return true;
+
+            return false;
+        });
     };
 
     const handleCategoryClick = (cat: string) => {
@@ -55,15 +66,15 @@ const DigitalMenu: React.FC = () => {
     const getItemImage = (item: MenuItem) => {
         if (item.image) return item.image;
 
-        const name = item.name.toLowerCase();
-        // Refeições
+        const name = normalize(item.name);
+        // Refeições e PFs
         if (name.includes('self service')) return "https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('prato feito 1')) return "https://images.unsplash.com/photo-1604908554161-3b0a30e6c8d6?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('prato feito 2')) return "https://images.unsplash.com/photo-1625944230945-1b7dd0c3a5b4?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('prato feito 3')) return "https://images.unsplash.com/photo-1617191518005-9d6c07bcb35c?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('prato feito 1') || name.includes('pf 1')) return "https://images.unsplash.com/photo-1604908554161-3b0a30e6c8d6?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('prato feito 2') || name.includes('pf 2')) return "https://images.unsplash.com/photo-1625944230945-1b7dd0c3a5b4?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('prato feito 3') || name.includes('pf 3')) return "https://images.unsplash.com/photo-1617191518005-9d6c07bcb35c?auto=format&fit=crop&w=400&q=80";
         if (name.includes('feijoada')) return "https://images.unsplash.com/photo-1625944525533-473f1c1b8d9c?auto=format&fit=crop&w=400&q=80";
 
-        // Para Levar (Marmitas)
+        // Marmitas / Para Levar
         if (name.includes('marmita')) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=400&q=80";
 
         // Porções
@@ -72,89 +83,52 @@ const DigitalMenu: React.FC = () => {
         if (name.includes('calabresa')) return "https://images.unsplash.com/photo-1599321955419-78332151127b?auto=format&fit=crop&w=400&q=80";
 
         // Bebidas
-        if (name.includes('coca') || name.includes('refrigerante')) return "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('cerveja') || name.includes('heineken') || name.includes('skol')) return "https://images.unsplash.com/photo-1532634896-26909d0d4b89?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('suco')) return "https://images.unsplash.com/photo-1613478223719-2ab802602423?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('agua')) return "https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('coca') || name.includes('refrigerante') || name.includes('suco') || name.includes('agua')) return "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('cerveja') || name.includes('heineken') || name.includes('skol') || name.includes('chopp')) return "https://images.unsplash.com/photo-1532634896-26909d0d4b89?auto=format&fit=crop&w=400&q=80";
 
         // Sobremesas
-        if (name.includes('mousse')) return "https://images.unsplash.com/photo-1605478900471-3e3ed7c02c8f?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('pudim')) return "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('bolo')) return "https://images.unsplash.com/photo-1612197527273-1f4c8b1d4b8a?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('gelatina')) return "https://images.unsplash.com/photo-1589307004395-9e4c5c5f9a9c?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('mousse') || name.includes('pudim') || name.includes('bolo') || name.includes('gelatina')) return "https://images.unsplash.com/photo-1605478900471-3e3ed7c02c8f?auto=format&fit=crop&w=400&q=80";
 
         return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80";
     };
 
-    const renderRefeicoes = () => (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {itemsByCategory('Refeições').map((item) => (
-                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
-                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
-                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
-                    <p className="text-red-600 font-black text-lg tracking-tighter">
-                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                </div>
-            ))}
+    const renderEmptyState = () => (
+        <div className="flex flex-col items-center justify-center p-12 text-center opacity-40">
+            <span className="material-symbols-outlined text-6xl mb-4 text-red-600 font-light">inventory_2</span>
+            <p className="font-bold text-lg uppercase tracking-widest text-[#181111]">Nenhum item disponível</p>
+            <p className="text-sm">Os pratos aparecerão aqui assim que forem adicionados no painel.</p>
         </div>
     );
 
-    const renderParaLevar = () => (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {itemsByCategory('Para Levar').map((item) => (
-                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
-                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
-                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
-                    <p className="text-red-600 font-black text-lg tracking-tighter">
-                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                </div>
-            ))}
-        </div>
-    );
+    const renderItemsGrid = (category: string) => {
+        const items = itemsByCategory(category);
+        if (items.length === 0) return renderEmptyState();
 
-    const renderPorcoes = () => (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {itemsByCategory('Porções').map((item) => (
-                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
-                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
-                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
-                    <p className="text-red-600 font-black text-lg tracking-tighter">
-                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                </div>
-            ))}
-        </div>
-    );
-
-    const renderBebidas = () => (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {itemsByCategory('Bebidas').map((item) => (
-                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
-                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
-                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
-                    <p className="text-red-600 font-black text-lg tracking-tighter">
-                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                </div>
-            ))}
-        </div>
-    );
-
-    const renderSobremesas = () => (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {itemsByCategory('Sobremesas').map((item) => (
-                <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center">
-                    <img src={getItemImage(item)} alt={item.name} className="w-full h-24 object-cover rounded-xl mb-3 hover:scale-105 transition-transform duration-500" />
-                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center">{item.name}</h3>
-                    <p className="text-red-600 font-black text-lg tracking-tighter">
-                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                </div>
-            ))}
-        </div>
-    );
+        return (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {items.map((item) => (
+                    <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center group">
+                        <div className="relative w-full overflow-hidden rounded-xl mb-3 h-24">
+                            <img
+                                src={getItemImage(item)}
+                                alt={item.name}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                onError={(e) => {
+                                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80";
+                                }}
+                            />
+                        </div>
+                        <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center justify-center line-clamp-2">
+                            {item.name}
+                        </h3>
+                        <p className="text-red-600 font-black text-lg tracking-tighter">
+                            R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </p>
+                    </div>
+                ))}
+            </div>
+        );
+    };
 
     const bannerImages = [
         "/banner/banner1.png",
@@ -291,11 +265,14 @@ const DigitalMenu: React.FC = () => {
 
                 {/* Tab Content Rendering */}
                 <div className="transition-all duration-500 pb-20">
-                    {activeCategory === 'Refeições' && renderRefeicoes()}
-                    {activeCategory === 'Para Levar' && renderParaLevar()}
-                    {activeCategory === 'Porções' && renderPorcoes()}
-                    {activeCategory === 'Bebidas' && renderBebidas()}
-                    {activeCategory === 'Sobremesas' && renderSobremesas()}
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center p-20 text-red-600">
+                            <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+                            <p className="font-bold uppercase tracking-widest text-xs">Carregando cardápio...</p>
+                        </div>
+                    ) : (
+                        renderItemsGrid(activeCategory)
+                    )}
                 </div>
             </div>
 
