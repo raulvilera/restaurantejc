@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { MenuItem } from '../types';
 
@@ -7,8 +8,16 @@ const DigitalMenu: React.FC = () => {
     const [activeCategory, setActiveCategory] = useState<string>('Refeições');
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const categories = ['Refeições', 'Para Levar', 'Porções', 'Bebidas', 'Sobremesas'];
+    const adminLinks = [
+        { name: 'Painel Geral', path: '/admin', icon: 'dashboard' },
+        { name: 'Meus Pedidos', path: '/admin/orders', icon: 'shopping_basket' },
+        { name: 'Gerenciar Menu', path: '/admin/menu', icon: 'restaurant_menu' },
+        { name: 'Meus Clientes', path: '/admin/customers', icon: 'group' },
+        { name: 'Configurações', path: '/admin/settings', icon: 'settings' },
+    ];
 
     useEffect(() => {
         const fetchMenu = async () => {
@@ -190,7 +199,63 @@ const DigitalMenu: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-white pb-32 overflow-x-hidden">
+        <div className="min-h-screen bg-white pb-32 overflow-x-hidden relative">
+            {/* Botão Hamburger Menu */}
+            <button
+                onClick={() => setIsMenuOpen(true)}
+                className="fixed top-6 left-6 z-50 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl flex items-center justify-center border border-slate-100 active:scale-95 transition-all text-red-600"
+            >
+                <span className="material-symbols-outlined text-3xl font-bold">menu</span>
+            </button>
+
+            {/* Backdrop do Menu */}
+            {isMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] animate-in fade-in duration-300"
+                    onClick={() => setIsMenuOpen(false)}
+                ></div>
+            )}
+
+            {/* Drawer Lateral */}
+            <div className={`fixed top-0 left-0 h-full w-[280px] bg-[#0b0f1a] z-[70] shadow-2xl transition-transform duration-500 ease-out transform ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="flex flex-col h-full">
+                    {/* Header do Menu */}
+                    <div className="p-8 border-b border-white/5 flex flex-col items-center">
+                        <div className="w-20 h-20 bg-red-600 rounded-3xl flex items-center justify-center shadow-lg mb-4 rotate-3">
+                            <span className="material-symbols-outlined text-white text-4xl">restaurant</span>
+                        </div>
+                        <h2 className="text-xl font-black text-white italic tracking-tighter uppercase">JC Restaurantes</h2>
+                        <p className="text-[10px] text-red-500 font-bold tracking-[0.3em] mt-1">SISTEMA ADMIN</p>
+                    </div>
+
+                    {/* Links de Navegação */}
+                    <nav className="flex-1 p-6 space-y-2 mt-4">
+                        {adminLinks.map((link) => (
+                            <Link
+                                key={link.path}
+                                to={link.path}
+                                className="flex items-center gap-4 p-4 rounded-2xl text-slate-400 hover:text-white hover:bg-white/5 transition-all group"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                <span className={`material-symbols-outlined text-2xl group-hover:text-red-600 transition-colors`}>{link.icon}</span>
+                                <span className="font-bold text-sm tracking-tight">{link.name}</span>
+                            </Link>
+                        ))}
+                    </nav>
+
+                    {/* Footer do Menu */}
+                    <div className="p-8 border-t border-white/5">
+                        <button
+                            onClick={() => setIsMenuOpen(false)}
+                            className="w-full bg-red-600 text-white font-black py-4 rounded-2xl shadow-lg shadow-red-600/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                        >
+                            <span className="material-symbols-outlined text-xl">close</span>
+                            FECHAR MENU
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             {/* Header Banner - CARROSSEL INFINITO */}
             <div className="relative h-[480px] w-full overflow-hidden bg-slate-900">
                 <div className="animate-carousel-banner h-full">
@@ -210,14 +275,17 @@ const DigitalMenu: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f1a] via-black/20 to-transparent pointer-events-none"></div>
 
                 {/* Restaurant Info */}
-                <div className="absolute top-1/4 left-6 text-white text-shadow-lg z-10 pointer-events-none">
-                    <h1 className="text-5xl font-black text-white tracking-tight drop-shadow-[0_5px_15px_rgba(0,0,0,0.5)] uppercase italic">
+                <div className="absolute top-1/2 left-0 right-0 transform -translate-y-1/2 text-center text-white text-shadow-lg z-10 pointer-events-none px-6">
+                    <h1 className="text-6xl font-black text-white tracking-tighter drop-shadow-[0_8px_30px_rgba(0,0,0,0.8)] uppercase italic leading-none">
                         JC Restaurantes
                     </h1>
-                    <p className="text-base flex items-center gap-2 opacity-95 text-white font-black mt-3 drop-shadow-lg">
-                        <span className="material-symbols-outlined text-red-600 bg-white rounded-full p-0.5 text-sm font-bold">location_on</span>
-                        Jd das Camélias, São Paulo
-                    </p>
+                    <div className="flex items-center justify-center gap-2 mt-4">
+                        <span className="h-[2px] w-8 bg-red-600"></span>
+                        <p className="text-sm opacity-95 text-white font-black drop-shadow-lg uppercase tracking-[0.2em]">
+                            Jd das Camélias, SP
+                        </p>
+                        <span className="h-[2px] w-8 bg-red-600"></span>
+                    </div>
                 </div>
             </div>
 
