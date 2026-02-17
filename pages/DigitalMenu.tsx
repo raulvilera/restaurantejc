@@ -71,10 +71,10 @@ const DigitalMenu: React.FC = () => {
 
         const name = normalize(item.name);
         // Refeições e PFs
-        if (name.includes('self service')) return "https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('prato feito 1') || name.includes('pf 1')) return "https://images.unsplash.com/photo-1604908554161-3b0a30e6c8d6?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('prato feito 2') || name.includes('pf 2')) return "https://images.unsplash.com/photo-1625944230945-1b7dd0c3a5b4?auto=format&fit=crop&w=400&q=80";
-        if (name.includes('prato feito 3') || name.includes('pf 3')) return "https://images.unsplash.com/photo-1617191518005-9d6c07bcb35c?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('selfservice')) return "https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('pratofeito1') || name.includes('pf1')) return "https://images.unsplash.com/photo-1604908554161-3b0a30e6c8d6?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('pratofeito2') || name.includes('pf2')) return "https://images.unsplash.com/photo-1625944230945-1b7dd0c3a5b4?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('pratofeito3') || name.includes('pf3')) return "https://images.unsplash.com/photo-1617191518005-9d6c07bcb35c?auto=format&fit=crop&w=400&q=80";
         if (name.includes('feijoada')) return "https://images.unsplash.com/photo-1625944525533-473f1c1b8d9c?auto=format&fit=crop&w=400&q=80";
 
         // Marmitas / Para Levar
@@ -89,8 +89,11 @@ const DigitalMenu: React.FC = () => {
         if (name.includes('coca') || name.includes('refrigerante') || name.includes('suco') || name.includes('agua')) return "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=400&q=80";
         if (name.includes('cerveja') || name.includes('heineken') || name.includes('skol') || name.includes('chopp')) return "https://images.unsplash.com/photo-1532634896-26909d0d4b89?auto=format&fit=crop&w=400&q=80";
 
-        // Sobremesas
-        if (name.includes('mousse') || name.includes('pudim') || name.includes('bolo') || name.includes('gelatina')) return "https://images.unsplash.com/photo-1605478900471-3e3ed7c02c8f?auto=format&fit=crop&w=400&q=80";
+        // Sobremesas - NOVAS URLS
+        if (name.includes('mousse')) return "https://images.unsplash.com/photo-1605478900471-3e3ed7c02c8f?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('pudim')) return "https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('bolodepote') || name.includes('bolo')) return "https://images.unsplash.com/photo-1612197527273-1f4c8b1d4b8a?auto=format&fit=crop&w=400&q=80";
+        if (name.includes('gelatina') || name.includes('mosaico')) return "https://images.unsplash.com/photo-1589307004395-9e4c5c5f9a9c?auto=format&fit=crop&w=400&q=80";
 
         return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80";
     };
@@ -113,23 +116,23 @@ const DigitalMenu: React.FC = () => {
         if (items.length === 0) return renderEmptyState();
 
         return (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {items.map((item) => (
-                    <div key={item.id} className="p-3 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col items-center group">
-                        <div className="relative w-full overflow-hidden rounded-xl mb-3 h-24">
+                    <div key={item.id} className="p-3 border border-red-600/10 rounded-lg text-center bg-white shadow-sm hover:border-red-600/30 transition-all group">
+                        <div className="relative w-full overflow-hidden rounded-md mb-2 h-24">
                             <img
                                 src={getItemImage(item)}
                                 alt={item.name}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                className="w-full h-full object-cover rounded-md group-hover:scale-105 transition-transform duration-500"
                                 onError={(e) => {
                                     (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80";
                                 }}
                             />
                         </div>
-                        <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2 px-2 h-8 flex items-center justify-center line-clamp-2">
+                        <h3 className="font-semibold text-sm mt-2 text-[#181111] leading-tight line-clamp-2 h-10 flex items-center justify-center">
                             {item.name}
                         </h3>
-                        <p className="text-red-600 font-black text-lg tracking-tighter">
+                        <p className="text-red-600 font-bold">
                             R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </p>
                     </div>
