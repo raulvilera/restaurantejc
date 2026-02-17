@@ -17,23 +17,23 @@ export interface MenuItem {
   dietary?: string[];
 }
 
-export interface Order {
-  id: string;
-  customerName: string;
-  customerInitial: string;
-  items: string;
-  total: number;
-  status: OrderStatus;
-  time: string;
-}
-
 export interface Customer {
   id: string;
   name: string;
   contact: string;
-  lastOrder: string;
-  totalSpent: number;
+  last_order: string;
+  total_spent: number;
   initials: string;
+}
+
+export interface Order {
+  id: string;
+  customer_name: string;
+  customer_initial: string;
+  items: string;
+  total: number;
+  status: OrderStatus;
+  order_time: string;
 }
 
 export interface Metric {

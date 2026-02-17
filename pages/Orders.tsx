@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { OrderStatus } from '../types';
+import { OrderStatus, Order, Customer, MenuItem } from '../types';
 import { supabase } from '../lib/supabase';
 
 const statusStyles: Record<OrderStatus, string> = {
@@ -11,16 +11,29 @@ const statusStyles: Record<OrderStatus, string> = {
 };
 
 const Orders = () => {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('Todos os Pedidos');
+
+  // States for New Order
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [newOrder, setNewOrder] = useState({
+    customer_id: '',
+    items: [] as { id: string, name: string, quantity: number, price: number }[],
+  });
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
+      let query = supabase.from('orders').select('*');
+
+      if (activeFilter === 'Pendentes') query = query.eq('status', OrderStatus.PENDING);
+      if (activeFilter === 'Em Preparo') query = query.eq('status', OrderStatus.PREPARING);
+      if (activeFilter === 'Concluídos') query = query.eq('status', OrderStatus.COMPLETED);
+
+      const { data, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
       setOrders(data || []);
@@ -31,21 +44,77 @@ const Orders = () => {
     }
   };
 
+  const fetchInitialData = async () => {
+    const [custRes, menuRes] = await Promise.all([
+      supabase.from('customers').select('*').order('name'),
+      supabase.from('menu_items').select('*').order('name')
+    ]);
+    setCustomers(custRes.data || []);
+    setMenuItems(menuRes.data || []);
+  };
+
   useEffect(() => {
     fetchOrders();
-
-    // Configurar realtime
+    fetchInitialData();
     const subscription = supabase
       .channel('orders_channel')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
         fetchOrders();
       })
       .subscribe();
+    return () => { supabase.removeChannel(subscription); };
+  }, [activeFilter]);
 
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, []);
+  const handleStatusUpdate = async (id: string, currentStatus: OrderStatus) => {
+    let nextStatus: OrderStatus;
+    if (currentStatus === OrderStatus.PENDING) nextStatus = OrderStatus.PREPARING;
+    else if (currentStatus === OrderStatus.PREPARING) nextStatus = OrderStatus.COMPLETED;
+    else if (currentStatus === OrderStatus.COMPLETED) nextStatus = OrderStatus.PENDING; // Reabrir
+    else return;
+
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: nextStatus })
+        .eq('id', id);
+      if (error) throw error;
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+    }
+  };
+
+  const handleCreateOrder = async () => {
+    if (!newOrder.customer_id || newOrder.items.length === 0) {
+      alert('Selecione um cliente e pelo menos um item.');
+      return;
+    }
+
+    const customer = customers.find(c => c.id === newOrder.customer_id);
+    const total = newOrder.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    const itemsDescription = newOrder.items.map(i => `${i.quantity}x ${i.name}`).join(', ');
+    const orderId = `#${Math.floor(1000 + Math.random() * 9000)}`;
+
+    try {
+      const { error } = await supabase.from('orders').insert([{
+        id: orderId,
+        customer_name: customer?.name,
+        customer_initial: customer?.initials,
+        items: itemsDescription,
+        total: total,
+        status: OrderStatus.PENDING,
+        order_time: 'Agora'
+      }]);
+
+      if (error) throw error;
+
+      setIsModalOpen(false);
+      setNewOrder({ customer_id: '', items: [] });
+      fetchOrders();
+    } catch (error) {
+      console.error('Erro ao criar pedido:', error);
+      alert('Erro ao criar pedido.');
+    }
+  };
 
   return (
     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
@@ -65,7 +134,10 @@ const Orders = () => {
             <span className="material-symbols-outlined text-sm">filter_list</span>
             Filtrar
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+          >
             <span className="material-symbols-outlined text-sm">add</span>
             Novo Pedido
           </button>
@@ -73,10 +145,11 @@ const Orders = () => {
       </div>
 
       <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
-        {['Todos os Pedidos', 'Pendentes', 'Em Preparo', 'Concluídos'].map((filter, i) => (
+        {['Todos os Pedidos', 'Pendentes', 'Em Preparo', 'Concluídos'].map((filter) => (
           <button
             key={filter}
-            className={`px-4 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-all ${i === 0 ? 'bg-primary text-white' : 'bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark text-slate-500 hover:border-primary'
+            onClick={() => setActiveFilter(filter)}
+            className={`px-4 py-2 text-xs font-bold rounded-full whitespace-nowrap transition-all ${activeFilter === filter ? 'bg-primary text-white' : 'bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark text-slate-500 hover:border-primary'
               }`}
           >
             {filter}
@@ -135,7 +208,10 @@ const Orders = () => {
                         <button className="p-2 text-slate-400 hover:text-primary transition-colors">
                           <span className="material-symbols-outlined text-[20px]">visibility</span>
                         </button>
-                        <button className="bg-primary text-white text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-all">
+                        <button
+                          onClick={() => handleStatusUpdate(order.id, order.status as OrderStatus)}
+                          className="bg-primary text-white text-[11px] font-bold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-all"
+                        >
                           {order.status === OrderStatus.COMPLETED ? 'Reabrir' : 'Atualizar Status'}
                         </button>
                       </div>
@@ -179,6 +255,129 @@ const Orders = () => {
           </div>
         ))}
       </div>
+      {/* Modal de Novo Pedido */}
+      {isModalOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]" onClick={() => setIsModalOpen(false)} />
+          <div className="fixed inset-y-0 right-0 w-full max-w-lg bg-white dark:bg-surface-dark shadow-2xl z-[110] flex flex-col border-l border-slate-200 dark:border-border-dark animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-slate-200 dark:border-border-dark flex items-center justify-between">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary fill">add_shopping_cart</span>
+                Novo Pedido
+              </h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-500 hover:text-slate-800 dark:hover:text-white">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Selecionar Cliente</label>
+                <select
+                  className="w-full bg-slate-100 dark:bg-background-dark border-slate-200 dark:border-border-dark rounded-lg px-4 py-3 text-sm focus:ring-primary"
+                  value={newOrder.customer_id}
+                  onChange={(e) => setNewOrder({ ...newOrder, customer_id: e.target.value })}
+                >
+                  <option value="">Selecione um cliente...</option>
+                  {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Adicionar Itens</label>
+                <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-2">
+                  {menuItems.filter(m => m.active).map(item => (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        const existing = newOrder.items.find(i => i.id === item.id);
+                        if (existing) {
+                          setNewOrder({
+                            ...newOrder,
+                            items: newOrder.items.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)
+                          });
+                        } else {
+                          setNewOrder({
+                            ...newOrder,
+                            items: [...newOrder.items, { id: item.id, name: item.name, quantity: 1, price: item.price }]
+                          });
+                        }
+                      }}
+                      className="flex items-center justify-between p-3 bg-slate-50 dark:bg-background-dark/50 hover:bg-primary/5 rounded-lg border border-slate-200 dark:border-border-dark transition-all text-left"
+                    >
+                      <div>
+                        <p className="text-sm font-bold">{item.name}</p>
+                        <p className="text-xs text-slate-500">R$ {Number(item.price).toFixed(2)}</p>
+                      </div>
+                      <span className="material-symbols-outlined text-primary font-bold">add</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {newOrder.items.length > 0 && (
+                <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-border-dark">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Itens Selecionados</label>
+                  {newOrder.items.map(item => (
+                    <div key={item.id} className="flex items-center justify-between bg-white dark:bg-background-dark p-3 rounded-lg border border-slate-100 dark:border-border-dark shadow-sm">
+                      <div className="flex-1">
+                        <p className="text-sm font-bold">{item.name}</p>
+                        <p className="text-xs text-slate-500">R$ {Number(item.price).toFixed(2)} x {item.quantity}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            const updated = newOrder.items.map(i =>
+                              i.id === item.id ? { ...i, quantity: Math.max(0, i.quantity - 1) } : i
+                            ).filter(i => i.quantity > 0);
+                            setNewOrder({ ...newOrder, items: updated });
+                          }}
+                          className="size-7 flex items-center justify-center bg-slate-100 dark:bg-surface-dark rounded hover:bg-red-500/10 hover:text-red-500 transition-all font-black"
+                        >
+                          -
+                        </button>
+                        <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
+                        <button
+                          onClick={() => {
+                            const updated = newOrder.items.map(i =>
+                              i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+                            );
+                            setNewOrder({ ...newOrder, items: updated });
+                          }}
+                          className="size-7 flex items-center justify-center bg-slate-100 dark:bg-surface-dark rounded hover:bg-emerald-500/10 hover:text-emerald-500 transition-all font-black"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="pt-4 flex justify-between items-center text-lg">
+                    <span className="font-bold">Total do Pedido:</span>
+                    <span className="font-black text-primary">
+                      R$ {newOrder.items.reduce((acc, i) => acc + (i.price * i.quantity), 0).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t border-slate-200 dark:border-border-dark flex gap-3 bg-slate-50 dark:bg-background-dark/30">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="flex-1 bg-slate-200 dark:bg-surface-dark text-slate-500 font-bold py-3 rounded-lg hover:bg-slate-300"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCreateOrder}
+                className="flex-1 bg-primary text-white font-bold py-3 rounded-lg hover:bg-primary/90 shadow-lg shadow-primary/20"
+              >
+                Finalizar Pedido
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

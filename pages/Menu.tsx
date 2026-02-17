@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MenuItem } from '../types';
 import { supabase } from '../lib/supabase';
 
 const Menu = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Todos');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -19,6 +21,7 @@ const Menu = () => {
     image: 'https://picsum.photos/seed/food/400/300'
   });
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const categories = ['Todos', 'Refeições', 'Porções', 'Bebidas', 'Sobremesas'];
 
@@ -96,9 +99,11 @@ const Menu = () => {
     }
   };
 
-  const filteredItems = activeTab === 'Todos'
-    ? menuItems
-    : menuItems.filter(item => item.category === activeTab);
+  const filteredItems = menuItems.filter(item => {
+    const matchesTab = activeTab === 'Todos' || item.category === activeTab;
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesTab && matchesSearch;
+  });
 
   return (
     <div className="space-y-8 animate-in zoom-in-95 duration-500 relative min-h-[calc(100vh-160px)]">
@@ -125,21 +130,39 @@ const Menu = () => {
           <span className="material-symbols-outlined text-lg">add</span>
           Adicionar Novo Prato
         </button>
+        <button
+          onClick={() => navigate('/orders')}
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+        >
+          <span className="material-symbols-outlined text-lg">add</span>
+          Novo Pedido
+        </button>
       </div>
 
-      <div className="flex gap-4 border-b border-slate-200 dark:border-border-dark pb-4 overflow-x-auto no-scrollbar whitespace-nowrap">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setActiveTab(cat)}
-            className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === cat
+      <div className="flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1">
+          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+          <input
+            className="w-full pl-10 pr-4 py-2 bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-lg focus:ring-2 focus:ring-primary text-sm placeholder:text-slate-500 transition-all"
+            placeholder="Buscar prato pelo nome..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="flex gap-4 border-b border-slate-200 dark:border-border-dark pb-4 overflow-x-auto no-scrollbar whitespace-nowrap flex-1">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveTab(cat)}
+              className={`px-5 py-2 rounded-full text-sm font-bold transition-all ${activeTab === cat
                 ? 'bg-primary text-white shadow-md'
                 : 'bg-slate-200/50 dark:bg-surface-dark text-slate-500 hover:bg-slate-200'
-              }`}
-          >
-            {cat}
-          </button>
-        ))}
+                }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">

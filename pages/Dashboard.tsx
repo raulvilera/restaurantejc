@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, AreaChart, Area
 } from 'recharts';
@@ -45,6 +45,7 @@ const MetricCard = ({ label, value, trend, trendType, icon }: any) => (
 );
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalSales: 0,
     totalOrders: 0,
@@ -117,7 +118,10 @@ const Dashboard = () => {
             <span className="material-symbols-outlined text-lg">calendar_today</span>
             Últimos 30 dias
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95">
+          <button
+            onClick={() => navigate('/orders')}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+          >
             <span className="material-symbols-outlined text-lg">add</span>
             Novo Pedido
           </button>
