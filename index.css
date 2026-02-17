@@ -46,3 +46,25 @@ body {
   /* Se houver classes de status, talvez queiramos manter a cor original para avisos */
   /* Mas o usu√°rio pediu TODAS as palavras brancas. Vou priorizar o branco conforme pedido. */
 }
+
+/* Utilit·rio para esconder scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ajustes para o Card·pio Digital */
+.digital-menu-text-dark {
+  color: #0f172a !important; /* slate-900 */
+}
+
+.digital-menu-text-gray {
+  color: #64748b !important; /* slate-500 */
+}
+
+.digital-menu-text-red {
+  color: #dc2626 !important; /* red-600 */
+}
