@@ -1,0 +1,7 @@
+{
+  "name": "MJC Restaurante Admin",
+  "description": "A comprehensive restaurant management system featuring real-time order tracking, menu administration, customer loyalty insights, and sales performance analytics with a modern dark-themed dashboard.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
