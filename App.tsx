@@ -23,11 +23,11 @@ const Sidebar = () => {
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-border-dark flex flex-col z-50">
       <div className="p-6 flex items-center gap-3">
-        <div className="size-10 rounded-lg bg-primary flex items-center justify-center text-white">
-          <span className="material-symbols-outlined fill">restaurant</span>
+        <div className="size-12 rounded-lg flex items-center justify-center overflow-hidden">
+          <img src="https://mgeclrvmizqicscatnfs.supabase.co/storage/v1/object/public/assets/logo.png" alt="Logo JC" className="w-full h-full object-contain" />
         </div>
         <div>
-          <h1 className="text-sm font-bold leading-tight">MJC Admin</h1>
+          <h1 className="text-sm font-bold leading-tight">J C Restaurantes</h1>
           <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-semibold">Sistema de Gestão</p>
         </div>
       </div>
@@ -38,8 +38,8 @@ const Sidebar = () => {
             key={item.path}
             to={item.path}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${isActive(item.path)
-                ? 'bg-primary/10 text-primary border-l-4 border-primary'
-                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 hover:text-primary'
+              ? 'bg-primary/10 text-primary border-l-4 border-primary'
+              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-primary/10 hover:text-primary'
               }`}
           >
             <span className={`material-symbols-outlined text-[22px] ${isActive(item.path) ? 'fill' : ''}`}>
