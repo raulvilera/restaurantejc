@@ -51,20 +51,38 @@ const DigitalMenu: React.FC = () => {
     };
 
     const renderRefeicoes = () => (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-2 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {itemsByCategory('Refeições').map((item) => {
-                const isFeatured = item.description?.toLowerCase().includes('wed & sat') || item.name.toLowerCase().includes('feijoada');
+                const isFeatured = item.description?.toLowerCase().includes('wed & sat') ||
+                    item.name.toLowerCase().includes('feijoada') ||
+                    item.description?.toLowerCase().includes('wednesday') ||
+                    item.description?.toLowerCase().includes('saturday');
+
                 return (
-                    <div key={item.id} className={`flex flex-col justify-between p-5 rounded-2xl transition-all h-full ${isFeatured ? 'bg-red-50/40 border-l-[6px] border-red-600 shadow-sm' : 'bg-white border border-slate-50 shadow-sm'}`}>
-                        <div className="flex-1">
-                            <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                                <h3 className="font-bold digital-menu-text-dark text-lg leading-tight uppercase tracking-tight flex-1">{item.name}</h3>
-                                <span className="digital-menu-text-red font-black text-xl tracking-tighter whitespace-nowrap">
-                                    {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </span>
+                    <div
+                        key={item.id}
+                        className={`flex justify-between items-start p-4 rounded-xl transition-all duration-300 hover:bg-red-600/5 ${isFeatured ? 'bg-red-600/5 border-l-4 border-red-600' : ''
+                            }`}
+                    >
+                        <div className="flex-1 pr-4">
+                            <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-bold text-[#181111] text-lg leading-tight uppercase tracking-tight">
+                                    {item.name}
+                                </h3>
+                                {isFeatured && (
+                                    <span className="bg-red-600 text-[9px] text-white font-black px-2 py-0.5 rounded-full uppercase italic tracking-wider">
+                                        Wed & Sat
+                                    </span>
+                                )}
                             </div>
-                            {isFeatured && <span className="inline-block bg-red-600 text-[8px] text-white font-black px-1.5 py-0.5 rounded-sm uppercase italic tracking-tighter mb-2">WED & SAT</span>}
-                            <p className="text-xs digital-menu-text-gray font-medium leading-relaxed italic opacity-75">{item.description}</p>
+                            <p className="text-sm text-slate-500 font-medium leading-relaxed italic opacity-80">
+                                {item.description}
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-red-600 font-black text-xl tracking-tighter">
+                                {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </span>
                         </div>
                     </div>
                 );
@@ -289,19 +307,19 @@ const DigitalMenu: React.FC = () => {
                 </div>
             </div>
 
-            {/* Main Content Overlapping the Banner - TABS MODE */}
-            <div className="relative -mt-32 z-20 bg-white rounded-t-[40px] px-4 pt-8 shadow-[0_-15px_40px_-10px_rgba(0,0,0,0.25)] pb-10 min-h-screen">
+            {/* Main Content Immediately Below the Banner */}
+            <div className="relative z-20 bg-white px-4 pt-6 min-h-screen">
 
-                {/* Categories Navigation - NOW ALWAYS STICKY AT TOP OF THE CARD */}
-                <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md -mx-4 px-4 pb-4">
-                    <div className="flex gap-2 overflow-x-auto no-scrollbar py-2">
+                {/* Categories Navigation - STICKY AT TOP */}
+                <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md -mx-4 px-4 pb-4 pt-4 border-b border-red-600/10">
+                    <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
                         {categories.map((cat) => (
                             <button
                                 key={cat}
                                 onClick={() => handleCategoryClick(cat)}
-                                className={`px-6 py-3 rounded-full text-sm font-black transition-all whitespace-nowrap shadow-sm border ${activeCategory === cat
+                                className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap shadow-sm border ${activeCategory === cat
                                     ? 'bg-red-600 text-white border-red-600 scale-105'
-                                    : 'bg-slate-50 text-red-600 border-slate-100'
+                                    : 'bg-red-600/10 text-red-600 border-transparent'
                                     }`}
                             >
                                 {cat}
@@ -311,23 +329,20 @@ const DigitalMenu: React.FC = () => {
                 </div>
 
                 {/* Dynamic Category Title */}
-                <div className="mt-8 mb-6 border-b-2 border-red-500/10 pb-4 flex items-center gap-3">
-                    <span className="material-symbols-outlined text-red-600 text-2xl">
+                <div className="mt-8 mb-6 border-b-2 border-red-600/10 pb-2 flex items-center gap-3">
+                    <span className="material-symbols-outlined text-red-600 text-3xl font-light">
                         {activeCategory === 'Refeições' ? 'restaurant' :
                             activeCategory === 'Para Levar' ? 'takeout_dining' :
                                 activeCategory === 'Porções' ? 'bakery_dining' :
                                     activeCategory === 'Bebidas' ? 'local_bar' : 'icecream'}
                     </span>
-                    <h2 className="text-2xl font-black digital-menu-text-dark tracking-tighter uppercase italic">
-                        {activeCategory} {activeCategory === 'Refeições' ? '(Meals)' :
-                            activeCategory === 'Para Levar' ? '(Takeaway)' :
-                                activeCategory === 'Porções' ? '(Sides)' :
-                                    activeCategory === 'Bebidas' ? '(Drinks)' : ''}
+                    <h2 className="text-2xl font-black text-[#181111] tracking-tighter uppercase italic">
+                        {activeCategory}
                     </h2>
                 </div>
 
                 {/* Tab Content Rendering */}
-                <div className="transition-all duration-500">
+                <div className="transition-all duration-500 pb-20">
                     {activeCategory === 'Refeições' && renderRefeicoes()}
                     {activeCategory === 'Para Levar' && renderParaLevar()}
                     {activeCategory === 'Porções' && renderPorcoes()}
