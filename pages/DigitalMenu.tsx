@@ -51,152 +51,56 @@ const DigitalMenu: React.FC = () => {
     };
 
     const renderRefeicoes = () => (
-        <div className="space-y-2 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {itemsByCategory('Refeições').map((item) => {
-                const isFeatured = item.description?.toLowerCase().includes('wed & sat') ||
-                    item.name.toLowerCase().includes('feijoada') ||
-                    item.description?.toLowerCase().includes('wednesday') ||
-                    item.description?.toLowerCase().includes('saturday');
-
-                return (
-                    <div
-                        key={item.id}
-                        className={`flex justify-between items-start p-4 rounded-xl transition-all duration-300 hover:bg-red-600/5 ${isFeatured ? 'bg-red-600/5 border-l-4 border-red-600' : ''
-                            }`}
-                    >
-                        <div className="flex-1 pr-4">
-                            <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-bold text-[#181111] text-lg leading-tight uppercase tracking-tight">
-                                    {item.name}
-                                </h3>
-                                {isFeatured && (
-                                    <span className="bg-red-600 text-[9px] text-white font-black px-2 py-0.5 rounded-full uppercase italic tracking-wider">
-                                        Wed & Sat
-                                    </span>
-                                )}
-                            </div>
-                            <p className="text-sm text-slate-500 font-medium leading-relaxed italic opacity-80">
-                                {item.description}
-                            </p>
-                        </div>
-                        <div className="text-right">
-                            <span className="text-red-600 font-black text-xl tracking-tighter">
-                                {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                            </span>
-                        </div>
-                    </div>
-                );
-            })}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {itemsByCategory('Refeições').map((item) => (
+                <div key={item.id} className="p-4 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col justify-center min-h-[110px]">
+                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2">{item.name}</h3>
+                    <p className="text-red-600 font-black text-lg tracking-tighter">
+                        {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
+                </div>
+            ))}
         </div>
     );
 
-    const renderParaLevar = () => {
-        const marmitas = itemsByCategory('Para Levar').filter(i => i.name.toLowerCase().includes('marmita'));
-        const feijoadas = itemsByCategory('Para Levar').filter(i => i.name.toLowerCase().includes('feijoada'));
-
-        return (
-            <div className="space-y-6 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {marmitas.map(item => (
-                        <div key={item.id} className="flex justify-between items-center gap-4 p-5 rounded-2xl bg-white border border-slate-50 shadow-sm">
-                            <h3 className="font-bold digital-menu-text-dark text-lg uppercase tracking-tight">{item.name}</h3>
-                            <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                    ))}
+    const renderParaLevar = () => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {itemsByCategory('Para Levar').map((item) => (
+                <div key={item.id} className="p-4 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col justify-center min-h-[110px]">
+                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2">{item.name}</h3>
+                    <p className="text-red-600 font-black text-lg tracking-tighter">
+                        {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
                 </div>
+            ))}
+        </div>
+    );
 
-                {feijoadas.length > 0 && (
-                    <div className="bg-white rounded-3xl border border-slate-100 shadow-md p-6 border-l-[6px] border-red-600">
-                        <div className="flex items-center gap-2 mb-4">
-                            <span className="material-symbols-outlined text-red-600 text-sm">star</span>
-                            <h3 className="font-black text-red-600 text-lg uppercase italic tracking-tighter">Feijoada Completa</h3>
-                        </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                            {feijoadas.sort((a, b) => a.price - b.price).map(item => {
-                                const sizeMatch = item.name.match(/\(([^)]+)\)/) || item.name.match(/\s(PP|P|M|G)$/);
-                                const size = sizeMatch ? sizeMatch[1] : item.name.split(' ').pop();
-                                const label = item.name.includes('PP') ? 'Extra Small' : item.name.includes(' P') ? 'Small' : item.name.includes(' M') ? 'Medium' : 'Large';
-                                return (
-                                    <div key={item.id} className="flex flex-col">
-                                        <p className="text-[10px] font-black digital-menu-text-gray uppercase mb-1">{label} ({size})</p>
-                                        <p className="text-xl font-black digital-menu-text-dark tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
-            </div>
-        );
-    };
-
-    const renderPorcoes = () => {
-        const batatas = itemsByCategory('Porções').filter(i => i.name.toLowerCase().includes('batata'));
-        const outras = itemsByCategory('Porções').filter(i => !i.name.toLowerCase().includes('batata'));
-
-        return (
-            <div className="space-y-6 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="bg-white rounded-3xl border border-slate-100 shadow-md p-6 bg-red-50/20">
-                    <h3 className="font-black digital-menu-text-dark text-lg mb-4 uppercase tracking-tight">Batata Frita</h3>
-                    <div className="grid grid-cols-3 gap-2">
-                        {batatas.sort((a, b) => a.price - b.price).map(item => {
-                            const size = item.name.includes(' P') || item.name.includes('PEQUENA') ? 'PEQUENA' : item.name.includes(' M') || item.name.includes('MÉDIA') ? 'MÉDIA' : 'GRANDE';
-                            return (
-                                <div key={item.id} className="bg-white p-3 rounded-xl border border-red-100 text-center shadow-sm">
-                                    <p className="text-[8px] font-black digital-menu-text-gray uppercase mb-1">{size}</p>
-                                    <p className="text-sm font-black digital-menu-text-red tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
-                                </div>
-                            );
-                        })}
-                    </div>
+    const renderPorcoes = () => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {itemsByCategory('Porções').map((item) => (
+                <div key={item.id} className="p-4 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col justify-center min-h-[110px]">
+                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2">{item.name}</h3>
+                    <p className="text-red-600 font-black text-lg tracking-tighter">
+                        {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {outras.map(item => (
-                        <div key={item.id} className="flex justify-between items-center gap-4 p-5 rounded-2xl bg-white border border-slate-50 shadow-sm">
-                            <h3 className="font-bold digital-menu-text-dark text-lg uppercase tracking-tight">{item.name}</h3>
-                            <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
+            ))}
+        </div>
+    );
 
-    const renderBebidas = () => {
-        const drinks = itemsByCategory('Bebidas');
-        const subCategories = {
-            'PRINCIPAIS': drinks.filter(i => i.name.includes('2L') || i.name.includes('NATURAL')),
-            'REFRIGERANTES': ['Lata', '600ml', '1L', '1.5L', '2L'],
-            'CERVEJAS': ['Skol', 'Heineken', 'Brahma']
-        };
-
-        return (
-            <div className="space-y-8 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {subCategories.PRINCIPAIS.map(item => (
-                        <div key={item.id} className="flex justify-between items-center gap-4 p-5 rounded-2xl bg-white border border-slate-50 shadow-sm">
-                            <div className="flex-1">
-                                <h3 className="font-bold digital-menu-text-dark text-lg uppercase tracking-tight">{item.name}</h3>
-                                {item.name.includes('2L') && <p className="text-[10px] digital-menu-text-gray italic font-medium mt-1">Perfect for sharing</p>}
-                                {item.name.includes('NATURAL') && <p className="text-[10px] digital-menu-text-gray italic font-medium mt-1">Fresh seasonal fruits</p>}
-                            </div>
-                            <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        </div>
-                    ))}
+    const renderBebidas = () => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {itemsByCategory('Bebidas').map((item) => (
+                <div key={item.id} className="p-4 border border-red-600/10 rounded-2xl bg-white shadow-sm hover:border-red-600/30 transition-all flex flex-col justify-center min-h-[110px]">
+                    <h3 className="font-bold text-[#181111] text-xs uppercase leading-tight mb-2">{item.name}</h3>
+                    <p className="text-red-600 font-black text-lg tracking-tighter">
+                        {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
                 </div>
-
-                <div className="space-y-4">
-                    <p className="text-[10px] font-black digital-menu-text-gray uppercase tracking-widest border-b border-slate-100 pb-1">Refrigerantes</p>
-                    <p className="text-xs digital-menu-text-gray font-bold italic opacity-70">Lata, 600ml, 1L, 1.5L, 2L</p>
-                </div>
-
-                <div className="space-y-4">
-                    <p className="text-[10px] font-black digital-menu-text-gray uppercase tracking-widest border-b border-slate-100 pb-1">Cervejas</p>
-                    <p className="text-xs digital-menu-text-gray font-bold italic opacity-70">Skol, Heineken, Brahma</p>
-                </div>
-            </div>
-        );
-    };
+            ))}
+        </div>
+    );
 
     const renderSobremesas = () => (
         <div className="grid grid-cols-2 gap-4 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
