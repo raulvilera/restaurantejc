@@ -38,32 +38,24 @@ const DigitalMenu: React.FC = () => {
 
     const handleCategoryClick = (cat: string) => {
         setActiveCategory(cat);
-        const element = document.getElementById(cat);
-        if (element) {
-            const offset = 80;
-            const bodyRect = document.body.getBoundingClientRect().top;
-            const elementRect = element.getBoundingClientRect().top;
-            const elementPosition = elementRect - bodyRect;
-            const offsetPosition = elementPosition - offset;
-            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-        }
+        // Removemos o scroll para manter o banner estático
     };
 
     const renderRefeicoes = () => (
-        <div className="space-y-4 px-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {itemsByCategory('Refeições').map((item) => {
                 const isFeatured = item.description?.toLowerCase().includes('wed & sat') || item.name.toLowerCase().includes('feijoada');
                 return (
-                    <div key={item.id} className={`flex justify-between gap-4 p-5 rounded-2xl transition-all ${isFeatured ? 'bg-red-50/40 border-l-[6px] border-red-600 shadow-sm' : 'bg-white border border-slate-50 shadow-sm'}`}>
+                    <div key={item.id} className={`flex flex-col justify-between p-5 rounded-2xl transition-all h-full ${isFeatured ? 'bg-red-50/40 border-l-[6px] border-red-600 shadow-sm' : 'bg-white border border-slate-50 shadow-sm'}`}>
                         <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                                <h3 className="font-bold digital-menu-text-dark text-lg leading-tight uppercase tracking-tight">{item.name}</h3>
-                                {isFeatured && <span className="bg-red-600 text-[8px] text-white font-black px-1.5 py-0.5 rounded-sm uppercase italic tracking-tighter">WED & SAT</span>}
+                            <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
+                                <h3 className="font-bold digital-menu-text-dark text-lg leading-tight uppercase tracking-tight flex-1">{item.name}</h3>
+                                <span className="digital-menu-text-red font-black text-xl tracking-tighter whitespace-nowrap">
+                                    {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </span>
                             </div>
-                            <p className="text-xs digital-menu-text-gray mt-2 font-medium leading-relaxed italic opacity-75">{item.description}</p>
-                        </div>
-                        <div className="text-right flex flex-col justify-start">
-                            <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                            {isFeatured && <span className="inline-block bg-red-600 text-[8px] text-white font-black px-1.5 py-0.5 rounded-sm uppercase italic tracking-tighter mb-2">WED & SAT</span>}
+                            <p className="text-xs digital-menu-text-gray font-medium leading-relaxed italic opacity-75">{item.description}</p>
                         </div>
                     </div>
                 );
@@ -76,13 +68,15 @@ const DigitalMenu: React.FC = () => {
         const feijoadas = itemsByCategory('Para Levar').filter(i => i.name.toLowerCase().includes('feijoada'));
 
         return (
-            <div className="space-y-6 px-1">
-                {marmitas.map(item => (
-                    <div key={item.id} className="flex justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-50 shadow-sm">
-                        <h3 className="font-bold digital-menu-text-dark text-lg uppercase tracking-tight">{item.name}</h3>
-                        <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                    </div>
-                ))}
+            <div className="space-y-6 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {marmitas.map(item => (
+                        <div key={item.id} className="flex justify-between items-center gap-4 p-5 rounded-2xl bg-white border border-slate-50 shadow-sm">
+                            <h3 className="font-bold digital-menu-text-dark text-lg uppercase tracking-tight">{item.name}</h3>
+                            <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                    ))}
+                </div>
 
                 {feijoadas.length > 0 && (
                     <div className="bg-white rounded-3xl border border-slate-100 shadow-md p-6 border-l-[6px] border-red-600">
@@ -90,7 +84,7 @@ const DigitalMenu: React.FC = () => {
                             <span className="material-symbols-outlined text-red-600 text-sm">star</span>
                             <h3 className="font-black text-red-600 text-lg uppercase italic tracking-tighter">Feijoada Completa</h3>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             {feijoadas.sort((a, b) => a.price - b.price).map(item => {
                                 const sizeMatch = item.name.match(/\(([^)]+)\)/) || item.name.match(/\s(PP|P|M|G)$/);
                                 const size = sizeMatch ? sizeMatch[1] : item.name.split(' ').pop();
@@ -114,7 +108,7 @@ const DigitalMenu: React.FC = () => {
         const outras = itemsByCategory('Porções').filter(i => !i.name.toLowerCase().includes('batata'));
 
         return (
-            <div className="space-y-6 px-1">
+            <div className="space-y-6 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="bg-white rounded-3xl border border-slate-100 shadow-md p-6 bg-red-50/20">
                     <h3 className="font-black digital-menu-text-dark text-lg mb-4 uppercase tracking-tight">Batata Frita</h3>
                     <div className="grid grid-cols-3 gap-2">
@@ -129,12 +123,14 @@ const DigitalMenu: React.FC = () => {
                         })}
                     </div>
                 </div>
-                {outras.map(item => (
-                    <div key={item.id} className="flex justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-50 shadow-sm">
-                        <h3 className="font-bold digital-menu-text-dark text-lg uppercase tracking-tight">{item.name}</h3>
-                        <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                    </div>
-                ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {outras.map(item => (
+                        <div key={item.id} className="flex justify-between items-center gap-4 p-5 rounded-2xl bg-white border border-slate-50 shadow-sm">
+                            <h3 className="font-bold digital-menu-text-dark text-lg uppercase tracking-tight">{item.name}</h3>
+                            <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     };
@@ -148,17 +144,19 @@ const DigitalMenu: React.FC = () => {
         };
 
         return (
-            <div className="space-y-8 px-1">
-                {subCategories.PRINCIPAIS.map(item => (
-                    <div key={item.id} className="flex justify-between gap-4 p-5 rounded-2xl bg-white border border-slate-50 shadow-sm">
-                        <div className="flex-1">
-                            <h3 className="font-bold digital-menu-text-dark text-lg uppercase tracking-tight">{item.name}</h3>
-                            {item.name.includes('2L') && <p className="text-[10px] digital-menu-text-gray italic font-medium mt-1">Perfect for sharing</p>}
-                            {item.name.includes('NATURAL') && <p className="text-[10px] digital-menu-text-gray italic font-medium mt-1">Fresh seasonal fruits</p>}
+            <div className="space-y-8 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {subCategories.PRINCIPAIS.map(item => (
+                        <div key={item.id} className="flex justify-between items-center gap-4 p-5 rounded-2xl bg-white border border-slate-50 shadow-sm">
+                            <div className="flex-1">
+                                <h3 className="font-bold digital-menu-text-dark text-lg uppercase tracking-tight">{item.name}</h3>
+                                {item.name.includes('2L') && <p className="text-[10px] digital-menu-text-gray italic font-medium mt-1">Perfect for sharing</p>}
+                                {item.name.includes('NATURAL') && <p className="text-[10px] digital-menu-text-gray italic font-medium mt-1">Fresh seasonal fruits</p>}
+                            </div>
+                            <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         </div>
-                        <span className="digital-menu-text-red font-black text-xl tracking-tighter">{item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                    </div>
-                ))}
+                    ))}
+                </div>
 
                 <div className="space-y-4">
                     <p className="text-[10px] font-black digital-menu-text-gray uppercase tracking-widest border-b border-slate-100 pb-1">Refrigerantes</p>
@@ -174,10 +172,10 @@ const DigitalMenu: React.FC = () => {
     };
 
     const renderSobremesas = () => (
-        <div className="grid grid-cols-2 gap-4 px-1">
+        <div className="grid grid-cols-2 gap-4 px-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {itemsByCategory('Sobremesas').map(item => (
-                <div key={item.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm text-center">
-                    <h3 className="font-black digital-menu-text-dark text-sm uppercase mb-1">{item.name}</h3>
+                <div key={item.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm text-center flex items-center justify-center min-h-[80px]">
+                    <h3 className="font-black digital-menu-text-dark text-sm uppercase">{item.name}</h3>
                 </div>
             ))}
         </div>
@@ -206,10 +204,10 @@ const DigitalMenu: React.FC = () => {
                 </div>
             </div>
 
-            {/* Main Content Overlapping the Banner */}
+            {/* Main Content Overlapping the Banner - TABS MODE */}
             <div className="relative -mt-32 z-20 bg-white rounded-t-[40px] px-4 pt-8 shadow-[0_-15px_40px_-10px_rgba(0,0,0,0.25)] pb-10 min-h-screen">
 
-                {/* Categories Navigation sticky */}
+                {/* Categories Navigation - NOW ALWAYS STICKY AT TOP OF THE CARD */}
                 <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md -mx-4 px-4 pb-4">
                     <div className="flex gap-2 overflow-x-auto no-scrollbar py-2">
                         {categories.map((cat) => (
@@ -227,32 +225,29 @@ const DigitalMenu: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Menu Content with specialized rendering */}
-                <div className="space-y-16 mt-8">
-                    {categories.map((category) => (
-                        <section key={category} id={category} className="space-y-6 scroll-mt-24">
-                            <div className="flex items-center gap-3 border-b-2 border-red-500/10 pb-4">
-                                <span className="material-symbols-outlined text-red-600 text-2xl">
-                                    {category === 'Refeições' ? 'restaurant' :
-                                        category === 'Para Levar' ? 'takeout_dining' :
-                                            category === 'Porções' ? 'bakery_dining' :
-                                                category === 'Bebidas' ? 'local_bar' : 'icecream'}
-                                </span>
-                                <h2 className="text-2xl font-black digital-menu-text-dark tracking-tighter uppercase italic">
-                                    {category} {category === 'Refeições' ? '(Meals)' :
-                                        category === 'Para Levar' ? '(Takeaway)' :
-                                            category === 'Porções' ? '(Sides)' :
-                                                category === 'Bebidas' ? '(Drinks)' : ''}
-                                </h2>
-                            </div>
+                {/* Dynamic Category Title */}
+                <div className="mt-8 mb-6 border-b-2 border-red-500/10 pb-4 flex items-center gap-3">
+                    <span className="material-symbols-outlined text-red-600 text-2xl">
+                        {activeCategory === 'Refeições' ? 'restaurant' :
+                            activeCategory === 'Para Levar' ? 'takeout_dining' :
+                                activeCategory === 'Porções' ? 'bakery_dining' :
+                                    activeCategory === 'Bebidas' ? 'local_bar' : 'icecream'}
+                    </span>
+                    <h2 className="text-2xl font-black digital-menu-text-dark tracking-tighter uppercase italic">
+                        {activeCategory} {activeCategory === 'Refeições' ? '(Meals)' :
+                            activeCategory === 'Para Levar' ? '(Takeaway)' :
+                                activeCategory === 'Porções' ? '(Sides)' :
+                                    activeCategory === 'Bebidas' ? '(Drinks)' : ''}
+                    </h2>
+                </div>
 
-                            {category === 'Refeições' && renderRefeicoes()}
-                            {category === 'Para Levar' && renderParaLevar()}
-                            {category === 'Porções' && renderPorcoes()}
-                            {category === 'Bebidas' && renderBebidas()}
-                            {category === 'Sobremesas' && renderSobremesas()}
-                        </section>
-                    ))}
+                {/* Tab Content Rendering */}
+                <div className="transition-all duration-500">
+                    {activeCategory === 'Refeições' && renderRefeicoes()}
+                    {activeCategory === 'Para Levar' && renderParaLevar()}
+                    {activeCategory === 'Porções' && renderPorcoes()}
+                    {activeCategory === 'Bebidas' && renderBebidas()}
+                    {activeCategory === 'Sobremesas' && renderSobremesas()}
                 </div>
             </div>
 
