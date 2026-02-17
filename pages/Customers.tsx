@@ -1,149 +1,149 @@
 
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import React, { useState, useEffect } from 'react';
+import { Customer } from '../types';
+import { supabase } from '../lib/supabase';
 
 const Customers = () => {
-  const [customers, setCustomers] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    total: 0,
-    avgTicket: 0,
-    newThisMonth: 0
-  });
+
+  const fetchCustomers = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      setCustomers(data || []);
+    } catch (error) {
+      console.error('Erro ao buscar clientes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('orders')
-          .select('customer_name, customer_phone, total, created_at');
-
-        if (error) throw error;
-
-        // Agrupar por nome do cliente
-        const customerMap: Record<string, any> = {};
-        let totalSales = 0;
-        let orderCount = 0;
-
-        data?.forEach(order => {
-          const name = order.customer_name || 'Anônimo';
-          if (!customerMap[name]) {
-            customerMap[name] = {
-              name,
-              contact: order.customer_phone || 'N/A',
-              lastOrder: order.created_at,
-              totalSpent: 0,
-              initials: name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase(),
-              orderCount: 0
-            };
-          }
-          customerMap[name].totalSpent += Number(order.total);
-          customerMap[name].orderCount += 1;
-          if (new Date(order.created_at) > new Date(customerMap[name].lastOrder)) {
-            customerMap[name].lastOrder = order.created_at;
-          }
-          totalSales += Number(order.total);
-          orderCount += 1;
-        });
-
-        const customerList = Object.values(customerMap).sort((a, b) => b.totalSpent - a.totalSpent);
-        setCustomers(customerList);
-        setStats({
-          total: customerList.length,
-          avgTicket: orderCount > 0 ? totalSales / orderCount : 0,
-          newThisMonth: 0 // Simplificado
-        });
-
-      } catch (err) {
-        console.error('Erro ao buscar clientes:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCustomers();
   }, []);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-  };
-
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2 text-google-text-secondary text-sm">
-          <span className="material-symbols-outlined text-lg">group</span>
-          Gerencie e explore sua base de clientes fidelizados.
+    <div className="space-y-6 animate-in slide-in-from-left-4 duration-500">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Gestão de Clientes</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Visualize e gerencie a base de clientes do seu restaurante.</p>
         </div>
-        <div className="flex gap-2">
-          <button className="px-4 py-1.5 border border-google-gray-300 rounded text-sm font-medium hover:bg-white transition-all bg-google-gray-200/50">
-            Exportar XLS
-          </button>
-        </div>
+        <button className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 text-sm font-semibold transition-all shadow-lg shadow-primary/20">
+          <span className="material-symbols-outlined text-lg">person_add</span>
+          Adicionar Cliente
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="looker-card p-4">
-          <p className="text-[10px] font-bold text-google-text-secondary uppercase tracking-tight mb-1">Base Ativa</p>
-          <p className="text-xl font-bold text-google-text-primary">{stats.total} Clientes</p>
-        </div>
-        <div className="looker-card p-4">
-          <p className="text-[10px] font-bold text-google-text-secondary uppercase tracking-tight mb-1">Ticket Médio Geral</p>
-          <p className="text-xl font-bold text-google-text-primary">{formatCurrency(stats.avgTicket)}</p>
-        </div>
-        <div className="looker-card p-4 border-l-4 border-l-primary">
-          <p className="text-[10px] font-bold text-google-text-secondary uppercase tracking-tight mb-1">Nível de Retenção</p>
-          <p className="text-xl font-bold text-google-text-primary">85% <span className="text-[10px] font-normal text-green-600 ml-1">▲ 2%</span></p>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: 'Total Clientes', value: '1.240', trend: '12%', up: true },
+          { label: 'Ticket Médio', value: 'R$ 85,50', trend: '5%', up: true },
+          { label: 'Novos (Mês)', value: '48', trend: 'Estável', up: null },
+          { label: 'Fidelidade Média', value: '4.2', trend: 'pedidos', up: null },
+        ].map((stat, i) => (
+          <div key={i} className="bg-white dark:bg-surface-dark p-5 rounded-xl border border-slate-200 dark:border-border-dark shadow-sm">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
+            <div className="flex items-end gap-2">
+              <span className="text-2xl font-black">{stat.value}</span>
+              {stat.trend && (
+                <span className={`text-[10px] font-bold mb-1 ${stat.up === true ? 'text-emerald-500' : stat.up === false ? 'text-red-500' : 'text-slate-400'}`}>
+                  {stat.up !== null && <span className="material-symbols-outlined text-xs align-middle">{stat.up ? 'trending_up' : 'trending_down'}</span>} {stat.trend}
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
-      <div className="looker-card overflow-hidden">
-        <div className="p-4 border-b border-google-gray-300 bg-google-gray-100/30 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-google-text-primary">Explorador de Clientes</h3>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-google-text-secondary text-sm">search</span>
+      <div className="bg-white dark:bg-surface-dark border border-slate-200 dark:border-border-dark rounded-xl overflow-hidden shadow-sm">
+        <div className="p-4 flex flex-col md:flex-row gap-4 border-b border-slate-100 dark:border-border-dark">
+          <div className="relative flex-1">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
             <input
-              className="pl-8 pr-4 py-1 border border-google-gray-300 rounded text-xs focus:ring-1 focus:ring-primary w-64 outline-none"
-              placeholder="Pesquisar por nome ou celular..."
+              className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-background-dark border-none rounded-lg focus:ring-2 focus:ring-primary text-sm placeholder:text-slate-500 transition-all"
+              placeholder="Buscar por nome ou contato..."
             />
+          </div>
+          <div className="flex gap-2">
+            <button className="px-4 py-2 rounded-lg border border-slate-200 dark:border-border-dark hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-xs font-bold transition-all">
+              <span className="material-symbols-outlined text-lg">filter_list</span> Filtrar
+            </button>
+            <button className="px-4 py-2 rounded-lg border border-slate-200 dark:border-border-dark hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 text-xs font-bold transition-all">
+              <span className="material-symbols-outlined text-lg">file_download</span> Exportar
+            </button>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left">
             <thead>
-              <tr className="bg-white border-b border-google-gray-200">
-                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight">Identidade</th>
-                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight">Contato</th>
-                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight">Pedidos</th>
-                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight text-right">Total Gasto</th>
-                <th className="px-6 py-3 text-[11px] font-bold text-google-text-secondary uppercase tracking-tight text-right">Última Visita</th>
+              <tr className="border-b border-slate-100 dark:border-border-dark bg-slate-50 dark:bg-background-dark/50">
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nome</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Contato</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Último Pedido</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Total Gasto</th>
+                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-google-gray-100 bg-white">
+            <tbody className="divide-y divide-slate-100 dark:divide-border-dark">
               {loading ? (
-                <tr><td colSpan={5} className="px-6 py-12 text-center text-google-text-secondary text-xs">Carregando base de clientes...</td></tr>
-              ) : customers.length === 0 ? (
-                <tr><td colSpan={5} className="px-6 py-12 text-center text-google-text-secondary text-xs">Nenhum cliente registrado.</td></tr>
-              ) : customers.map((customer, idx) => (
-                <tr key={idx} className="hover:bg-google-gray-100/50 transition-colors group cursor-default">
-                  <td className="px-6 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="size-8 rounded flex items-center justify-center bg-primary/10 text-primary font-bold text-xs uppercase">
-                        {customer.initials}
-                      </div>
-                      <span className="text-xs font-bold text-google-text-primary">{customer.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3 text-xs text-google-text-secondary">{customer.contact}</td>
-                  <td className="px-6 py-3 text-xs text-google-text-secondary">{customer.orderCount} transações</td>
-                  <td className="px-6 py-3 text-xs font-bold text-google-text-primary text-right">{formatCurrency(customer.totalSpent)}</td>
-                  <td className="px-6 py-3 text-[10px] text-google-text-secondary text-right">{new Date(customer.lastOrder).toLocaleDateString()}</td>
+                <tr>
+                  <td colSpan={5} className="px-6 py-10 text-center text-slate-500 font-bold">Carregando clientes...</td>
                 </tr>
-              ))}
+              ) : customers.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-10 text-center text-slate-500 font-bold">Nenhum cliente encontrado.</td>
+                </tr>
+              ) : (
+                customers.map((c) => (
+                  <tr key={c.id} className="hover:bg-primary/5 transition-colors cursor-pointer group">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold">{c.initials}</div>
+                        <span className="font-bold text-sm">{c.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{c.contact}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 text-center">{c.lastOrder}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-[11px] font-bold">R$ {Number(c.totalSpent).toFixed(2)}</span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
+                        <button className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors" title="Editar">
+                          <span className="material-symbols-outlined text-lg">edit</span>
+                        </button>
+                        <button className="p-1.5 hover:bg-primary/10 rounded-lg text-slate-400 hover:text-primary transition-colors" title="Ver Detalhes">
+                          <span className="material-symbols-outlined text-lg">visibility</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
+        </div>
+        <div className="p-4 border-t border-slate-100 dark:border-border-dark flex items-center justify-between bg-slate-50 dark:bg-background-dark/30">
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Mostrando {customers.length} clientes</span>
+          <div className="flex gap-2">
+            <button className="size-8 rounded border border-slate-200 dark:border-border-dark flex items-center justify-center text-slate-400 hover:bg-primary/5 hover:text-primary transition-all disabled:opacity-50" disabled>
+              <span className="material-symbols-outlined text-lg">chevron_left</span>
+            </button>
+            <button className="size-8 rounded border border-primary/20 bg-primary text-white flex items-center justify-center text-xs font-bold shadow-sm">1</button>
+            <button className="size-8 rounded border border-slate-200 dark:border-border-dark flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-primary/5">2</button>
+            <button className="size-8 rounded border border-slate-200 dark:border-border-dark flex items-center justify-center text-xs font-bold text-slate-600 hover:bg-primary/5">3</button>
+            <button className="size-8 rounded border border-slate-200 dark:border-border-dark flex items-center justify-center text-slate-400 hover:bg-primary/5 hover:text-primary transition-all">
+              <span className="material-symbols-outlined text-lg">chevron_right</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
